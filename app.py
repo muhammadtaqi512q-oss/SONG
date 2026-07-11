@@ -35,18 +35,23 @@ ELSE_LINKS = [
     "https://share.gemini.google/pyTB8aaiL4qc"
 ]
 
+# Web interface load karne ke liye route
 @app.route('/')
 def home():
     return render_template('index.html')
 
+# Aapka Main API Endpoint jis se baqi AIs bhi pooch sakte hain
 @app.route('/mt/king/api/', methods=['POST', 'GET'])
 def get_music_api():
     if request.method == 'POST':
+        # JSON data handle karne ke liye (Agar baqi AIs POST request karein)
         data = request.get_json(silent=True) or {}
         chat_text = data.get('chat', '').lower()
     else:
+        # Query parameters handle karne ke liye (E.g. /mt/king/api/?chat=hello)
         chat_text = request.args.get('chat', '').lower()
 
+    # Agar chat khali ho to direct else mein se random link
     if not chat_text:
         return jsonify({
             "status": "success",
@@ -54,15 +59,18 @@ def get_music_api():
             "message": "No input provided, playing random fallback."
         })
 
+    # Keywords checker
     has_english = 'english' in chat_text
     has_urdu = 'urdu' in chat_text
     
+    # Mood detection
     detected_mood = None
     for mood in ['sad', 'happy', 'funny']:
         if mood in chat_text:
             detected_mood = mood
             break
 
+    # 1. Agar English aur Urdu dono hon ya dono mein se koi bhi na ho par mood ho
     if (has_english and has_urdu) or (not has_english and not has_urdu):
         if detected_mood:
             lang = random.choice(['english', 'urdu'])
@@ -70,12 +78,14 @@ def get_music_api():
         else:
             music_url = random.choice(ELSE_LINKS)
 
+    # 2. Agar sirf English keyword ho
     elif has_english:
         if detected_mood:
             music_url = MUSIC_DATA['english'][detected_mood]
         else:
             music_url = MUSIC_DATA['english']['default']
 
+    # 3. Agar sirf Urdu keyword ho
     elif has_urdu:
         if detected_mood:
             music_url = MUSIC_DATA['urdu'][detected_mood]
@@ -92,5 +102,4 @@ def get_music_api():
     })
 
 if __name__ == '__main__':
-    # GitHub Codespace ke liye host="0.0.0.0" hona zaroori ha
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(debug=True, port=5000)
