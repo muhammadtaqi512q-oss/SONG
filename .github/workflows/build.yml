@@ -1,4 +1,4 @@
-name: Build TAQI Browser Android APK
+name: Build Clean APK with Icon & Media Permissions
 
 on:
   push:
@@ -6,48 +6,62 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-android:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
 
-    - name: Install Buildozer & Dependencies
-      run: |
-        sudo dpkg --add-architecture i386
-        sudo apt-get update
-        sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5:i386 libstdc++6:i386 zlib1g:i386 cmake libffi-dev libssl-dev
-        pip install --upgrade pip
-        pip install buildozer Cython==0.29.33
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
 
-    - name: Initialize Buildozer Config
-      run: |
-        if [ ! -f "buildozer.spec" ]; then
-          buildozer init
-        fi
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
 
-    - name: Configure buildozer.spec for TAQI Browser
-      run: |
-        sed -i 's/#title =.*/title = TAQI Browser/' buildozer.spec
-        sed -i 's/#package.name =.*/package.name = taqibrowser/' buildozer.spec
-        sed -i 's/#package.domain =.*/package.domain = org.taqi/' buildozer.spec
-        sed -i 's/#source.include_exts =.*/source.include_exts = py,png,jpg,kv,atlas,html,ico/' buildozer.spec
-        sed -i 's/#requirements =.*/requirements = python3,kivy,pywebview,pyjnius/' buildozer.spec
-        sed -i 's/#orientation =.*/orientation = portrait/' buildozer.spec
-        sed -i 's/#fullscreen =.*/fullscreen = 0/' buildozer.spec
+      - name: Install Cordova & Build APK
+        run: |
+          npm install -g cordova
 
-    - name: Build APK with Buildozer
-      run: |
-        buildozer -v android debug
+          # 1. Create Cordova project
+          cordova create app com.taqi.avelia "TAQI Browser"
 
-    - name: Upload APK Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: TaqiBrowser-Android-APK
-        path: bin/*.apk
+          # 2. Copy home.html to index.html inside Cordova app
+          rm -rf app/www/*
+          cp ./home.html app/www/index.html
+
+          # 3. Copy Icon if present
+          if [ -f "icon.png" ]; then
+            cp icon.png app/www/icon.png
+            sed -i '/<\/widget>/i \    <icon src="www/icon.png" />' app/config.xml
+          fi
+
+          cd app
+
+          # 4. Add Android Platform
+          cordova platform add android
+
+          # 5. Add Required Plugins & Permissions
+          cordova plugin add cordova-plugin-media
+          cordova plugin add cordova-plugin-media-capture
+          cordova plugin add cordova-plugin-camera
+          cordova plugin add cordova-plugin-android-permissions
+
+          sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.RECORD_VIDEO" />' platforms/android/app/src/main/AndroidManifest.xml
+
+          # 6. Build APK
+          cordova build android --debug
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TAQI-APP-APK
+          path: app/platforms/android/app/build/outputs/apk/debug/app-debug.apk
