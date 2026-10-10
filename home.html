@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TAQI Search</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 5rem;
+            font-weight: 800;
+            letter-spacing: 6px;
+            color: #00ffff;
+            text-shadow: 0 0 30px rgba(0, 255, 255, 0.4);
+        }
+        .subtitle {
+            font-size: 0.95rem;
+            color: #888;
+            letter-spacing: 2px;
+            margin-top: 5px;
+            text-transform: uppercase;
+        }
+        .search-box-wrapper {
+            width: 650px;
+            max-width: 90%;
+            position: relative;
+        }
+        .search-box {
+            width: 100%;
+            padding: 16px 24px;
+            font-size: 1.1rem;
+            background: #1e1e1e;
+            border: 2px solid #333;
+            border-radius: 35px;
+            color: white;
+            outline: none;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+            transition: all 0.3s ease;
+        }
+        .search-box:focus {
+            border-color: #00ffff;
+            background: #252525;
+            box-shadow: 0 8px 30px rgba(0,255,255,0.2);
+        }
+        .footer {
+            position: absolute;
+            bottom: 25px;
+            font-size: 0.85rem;
+            color: #666;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo-container">
+        <div class="logo">TAQI</div>
+        <div class="subtitle">Created by Muhammad Taqi</div>
+    </div>
+
+    <div class="search-box-wrapper">
+        <input type="text" id="searchInput" class="search-box" placeholder="Search TAQI or type a URL..." autofocus>
+    </div>
+
+    <div class="footer">TAQI Browser Engine &bull; Secure & Fast</div>
+
+    <script>
+        const input = document.getElementById('searchInput');
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                let val = input.value.trim();
+                if (val) {
+                    if (val.startsWith('http://') || val.startsWith('https://')) {
+                        window.location.href = val;
+                    } else if (val.includes('.') && !val.includes(' ')) {
+                        window.location.href = 'https://' + val;
+                    } else {
+                        window.location.href = 'https://www.google.com/search?q=' + encodeURIComponent(val);
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
