@@ -1,4 +1,4 @@
-name: Build Clean APK with Icon & Media Permissions
+name: Build Clean APK with InAppBrowser
 
 on:
   push:
@@ -34,7 +34,7 @@ jobs:
           # 1. Create Cordova project
           cordova create app com.taqi.avelia "TAQI Browser"
 
-          # 2. Copy home.html to index.html inside Cordova app
+          # 2. Setup web files
           rm -rf app/www/*
           cp ./home.html app/www/index.html
 
@@ -49,12 +49,13 @@ jobs:
           # 4. Add Android Platform
           cordova platform add android
 
-          # 5. Add Required Plugins & Permissions
+          # 5. Add InAppBrowser and Essential Plugins
+          cordova plugin add cordova-plugin-inappbrowser
           cordova plugin add cordova-plugin-media
-          cordova plugin add cordova-plugin-media-capture
           cordova plugin add cordova-plugin-camera
           cordova plugin add cordova-plugin-android-permissions
 
+          # Inject Permissions
           sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.RECORD_VIDEO" />' platforms/android/app/src/main/AndroidManifest.xml
 
           # 6. Build APK
