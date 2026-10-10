@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 using Microsoft.Web.WebView2.WinForms;
 
@@ -8,7 +9,7 @@ namespace TaqiBrowser
     public class MainForm : Form
     {
         private TextBox urlBar;
-        private Button btnGo, btnBack, btnForward, btnRefresh;
+        private Button btnGo, btnBack, btnForward, btnRefresh, btnHome;
         private WebView2 webView;
         private Label headerLabel;
 
@@ -19,6 +20,13 @@ namespace TaqiBrowser
             this.Size = new Size(1200, 800);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = Color.FromArgb(30, 30, 30);
+
+            // Set Application Icon if present
+            try {
+                if (File.Exists("icon.ico")) {
+                    this.Icon = new Icon("icon.ico");
+                }
+            } catch {}
 
             // Header Branding Banner
             headerLabel = new Label() 
@@ -44,12 +52,13 @@ namespace TaqiBrowser
             btnBack = new Button() { Text = "◄", Width = 35, Left = 5, Top = 6, Height = 30, FlatStyle = FlatStyle.Flat, ForeColor = Color.White };
             btnForward = new Button() { Text = "►", Width = 35, Left = 45, Top = 6, Height = 30, FlatStyle = FlatStyle.Flat, ForeColor = Color.White };
             btnRefresh = new Button() { Text = "↻", Width = 35, Left = 85, Top = 6, Height = 30, FlatStyle = FlatStyle.Flat, ForeColor = Color.White };
+            btnHome = new Button() { Text = "🏠", Width = 35, Left = 125, Top = 6, Height = 30, FlatStyle = FlatStyle.Flat, ForeColor = Color.White };
             
             urlBar = new TextBox() 
             { 
-                Left = 128, 
+                Left = 168, 
                 Top = 8, 
-                Width = 900, 
+                Width = 860, 
                 Height = 28,
                 Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top, 
                 Font = new Font("Segoe UI", 10),
@@ -72,7 +81,7 @@ namespace TaqiBrowser
                 Font = new Font("Segoe UI", 9, FontStyle.Bold)
             };
 
-            navPanel.Controls.AddRange(new Control[] { btnBack, btnForward, btnRefresh, urlBar, btnGo });
+            navPanel.Controls.AddRange(new Control[] { btnBack, btnForward, btnRefresh, btnHome, urlBar, btnGo });
 
             // Chromium WebView2 Engine
             webView = new WebView2() { Dock = DockStyle.Fill };
@@ -87,6 +96,7 @@ namespace TaqiBrowser
             btnBack.Click += (s, e) => { if (webView.CoreWebView2 != null && webView.CoreWebView2.CanGoBack) webView.CoreWebView2.GoBack(); };
             btnForward.Click += (s, e) => { if (webView.CoreWebView2 != null && webView.CoreWebView2.CanGoForward) webView.CoreWebView2.GoForward(); };
             btnRefresh.Click += (s, e) => { if (webView.CoreWebView2 != null) webView.CoreWebView2.Reload(); };
+            btnHome.Click += (s, e) => NavigateToHome();
 
             InitializeBrowser();
         }
@@ -94,12 +104,25 @@ namespace TaqiBrowser
         private async void InitializeBrowser()
         {
             await webView.EnsureCoreWebView2Async(null);
-            webView.CoreWebView2.Navigate("https://www.google.com");
+            NavigateToHome();
 
-            // Sync URL bar on navigation
+            // Sync URL bar on navigation (hide local path if home)
             webView.CoreWebView2.SourceChanged += (s, e) => {
-                urlBar.Text = webView.CoreWebView2.Source;
+                string src = webView.CoreWebView2.Source;
+                if (src.Contains("home.html")) {
+                    urlBar.Text = "taqi://home";
+                } else {
+                    urlBar.Text = src;
+                }
             };
+        }
+
+        private void NavigateToHome()
+        {
+            if (webView.CoreWebView2 == null) return;
+            string homePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "home.html");
+            webView.CoreWebView2.Navigate(homePath);
+            urlBar.Text = "taqi://home";
         }
 
         private void NavigateToUrl()
@@ -107,7 +130,10 @@ namespace TaqiBrowser
             if (webView.CoreWebView2 == null) return;
 
             string query = urlBar.Text.Trim();
-            if (string.IsNullOrEmpty(query)) return;
+            if (string.IsNullOrEmpty(query) || query == "taqi://home") {
+                NavigateToHome();
+                return;
+            }
 
             if (!query.StartsWith("http://") && !query.StartsWith("https://"))
             {
