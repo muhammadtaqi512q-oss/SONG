@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Setup Java JDK
@@ -24,17 +24,17 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install Cordova & Build App
+      - name: Build Android APK
         run: |
           npm install -g cordova
           
-          # 1. Create Cordova project
+          # 1. Create Cordova Application
           cordova create app com.taqi.browser "TAQI Browser"
           
-          # 2. Copy all web assets to www folder
+          # 2. Copy Web Files
           cp -r *.html *.png *.jpg *.jpeg *.css *.js app/www/ 2>/dev/null || true
           
-          # 3. Handle icon if available
+          # 3. Add Custom App Icon (If icon.png exists in repo root)
           if [ -f "icon.png" ]; then
             cp icon.png app/www/icon.png
             sed -i '/<\/widget>/i \    <icon src="www/icon.png" />' app/config.xml
@@ -42,20 +42,20 @@ jobs:
 
           cd app
           
-          # 4. Add Android platform
+          # 4. Add Android Platform
           cordova platform add android
           
-          # 5. Add required Cordova plugins for browsing & permissions
+          # 5. Add Required Plugins for Native Browsing & Media
           cordova plugin add cordova-plugin-inappbrowser
           cordova plugin add cordova-plugin-media
           cordova plugin add cordova-plugin-media-capture
           cordova plugin add cordova-plugin-camera
           cordova plugin add cordova-plugin-android-permissions
           
-          # Inject permissions into AndroidManifest.xml
-          sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />' platforms/android/app/src/main/AndroidManifest.xml
+          # 6. Inject Full Web & Media Permissions into AndroidManifest
+          sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />\n    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />' platforms/android/app/src/main/AndroidManifest.xml
           
-          # 6. Build Debug APK
+          # 7. Compile Debug APK
           cordova build android --debug
 
       - name: Upload APK Artifact
