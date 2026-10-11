@@ -1,8 +1,8 @@
-name: Build Clean APK with InAppBrowser
+name: Build TAQI Browser APK
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -24,46 +24,42 @@ jobs:
         with:
           node-version: 18
 
-      - name: Auto-Accept Android SDK Licenses
-        run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
-
-      - name: Install Cordova & Build APK
+      - name: Install Cordova & Build App
         run: |
           npm install -g cordova
-
+          
           # 1. Create Cordova project
-          cordova create app com.taqi.avelia "TAQI Browser"
-
-          # 2. Setup web files
-          rm -rf app/www/*
-          cp ./home.html app/www/index.html
-
-          # 3. Copy Icon if present
+          cordova create app com.taqi.browser "TAQI Browser"
+          
+          # 2. Copy all web assets to www folder
+          cp -r *.html *.png *.jpg *.jpeg *.css *.js app/www/ 2>/dev/null || true
+          
+          # 3. Handle icon if available
           if [ -f "icon.png" ]; then
             cp icon.png app/www/icon.png
             sed -i '/<\/widget>/i \    <icon src="www/icon.png" />' app/config.xml
           fi
 
           cd app
-
-          # 4. Add Android Platform
+          
+          # 4. Add Android platform
           cordova platform add android
-
-          # 5. Add InAppBrowser and Essential Plugins
+          
+          # 5. Add required Cordova plugins for browsing & permissions
           cordova plugin add cordova-plugin-inappbrowser
           cordova plugin add cordova-plugin-media
+          cordova plugin add cordova-plugin-media-capture
           cordova plugin add cordova-plugin-camera
           cordova plugin add cordova-plugin-android-permissions
-
-          # Inject Permissions
-          sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />\n    <uses-permission android:name="android.permission.RECORD_VIDEO" />' platforms/android/app/src/main/AndroidManifest.xml
-
-          # 6. Build APK
+          
+          # Inject permissions into AndroidManifest.xml
+          sed -i '/<\/manifest>/i \    <uses-permission android:name="android.permission.RECORD_AUDIO" />\n    <uses-permission android:name="android.permission.CAMERA" />\n    <uses-permission android:name="android.permission.INTERNET" />\n    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />' platforms/android/app/src/main/AndroidManifest.xml
+          
+          # 6. Build Debug APK
           cordova build android --debug
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: TAQI-APP-APK
+          name: TAQI-Browser-APK
           path: app/platforms/android/app/build/outputs/apk/debug/app-debug.apk
