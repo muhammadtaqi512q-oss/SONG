@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TAQI Browser</title>
     <style>
         * {
@@ -10,9 +9,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-            -webkit-tap-highlight-color: transparent;
         }
-
         body {
             background-color: #ffffff;
             color: #202124;
@@ -22,21 +19,21 @@
             overflow: hidden;
         }
 
-        /* Top Navigation Bar */
+        /* Top Browser Navigation Bar (Address Bar) */
         .browser-toolbar {
             display: flex;
             align-items: center;
-            padding: 8px 12px;
+            padding: 8px 14px;
             background: #ffffff;
             border-bottom: 1px solid #e0e0e0;
-            gap: 10px;
-            z-index: 1000;
+            gap: 12px;
         }
 
         .nav-icons {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 10px;
+            color: #5f6368;
         }
 
         .nav-btn {
@@ -48,23 +45,22 @@
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            padding: 8px;
+            padding: 6px;
             transition: background 0.2s;
         }
 
-        .nav-btn:hover, .nav-btn:active {
+        .nav-btn:hover {
             background: #f1f3f4;
         }
 
-        /* URL Address Bar */
         .address-bar-wrapper {
             flex: 1;
             display: flex;
             align-items: center;
             background: #f1f3f4;
             border-radius: 20px;
-            padding: 0 14px;
-            height: 40px;
+            padding: 0 16px;
+            height: 38px;
             border: 1px solid transparent;
             transition: all 0.2s;
         }
@@ -76,8 +72,8 @@
         }
 
         .top-t-logo {
-            width: 22px;
-            height: 22px;
+            width: 20px;
+            height: 20px;
             background: #003366;
             color: white;
             border-radius: 50%;
@@ -85,7 +81,7 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 11px;
             margin-right: 10px;
             flex-shrink: 0;
         }
@@ -96,73 +92,72 @@
             outline: none;
             background: transparent;
             font-size: 14px;
-            color: #202124;
+            color: #3c4043;
         }
 
         .toolbar-actions {
             display: flex;
             align-items: center;
+            gap: 12px;
+            color: #5f6368;
         }
 
         .user-profile-circle {
-            width: 32px;
-            height: 32px;
-            background: #003366;
+            width: 28px;
+            height: 28px;
+            background: #202124;
             color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
-            font-weight: bold;
+            font-size: 12px;
             cursor: pointer;
         }
 
-        /* Main Viewport */
+        /* Main Page Area */
         .main-viewport {
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .brand-title {
-            font-size: 68px;
-            font-weight: 800;
-            color: #003366;
-            letter-spacing: -1px;
-            margin-bottom: 25px;
-            user-select: none;
-            text-align: center;
-        }
-
-        /* Center Search Box */
-        .center-search-wrapper {
-            width: 100%;
-            max-width: 550px;
             position: relative;
-            margin-bottom: 35px;
+            margin-top: -30px;
+        }
+
+        /* TAQI Branding Title */
+        .brand-title {
+            font-size: 82px;
+            font-weight: 700;
+            color: #003366;
+            letter-spacing: -1.5px;
+            margin-bottom: 28px;
+            user-select: none;
+        }
+
+        /* Page Search Box */
+        .center-search-wrapper {
+            width: 550px;
+            max-width: 90vw;
+            position: relative;
         }
 
         .center-search-input {
             width: 100%;
-            height: 50px;
+            height: 48px;
             padding: 0 20px 0 48px;
             font-size: 15px;
             background: #ffffff;
             border: 1px solid #dfe1e5;
-            border-radius: 25px;
+            border-radius: 24px;
             outline: none;
             color: #202124;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
             transition: all 0.2s ease;
         }
 
         .center-search-input:hover, .center-search-input:focus {
-            box-shadow: 0 2px 8px rgba(32, 33, 36, 0.2);
+            box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
             border-color: rgba(223, 225, 229, 0);
         }
 
@@ -176,171 +171,85 @@
             fill: #5f6368;
             pointer-events: none;
         }
-
-        /* Popular Shortcuts Grid */
-        .shortcuts-grid {
-            display: flex;
-            gap: 18px;
-            flex-wrap: wrap;
-            justify-content: center;
-            width: 100%;
-            max-width: 550px;
-        }
-
-        .shortcut-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            width: 75px;
-            transition: transform 0.2s;
-        }
-
-        .shortcut-item:active {
-            transform: scale(0.95);
-        }
-
-        .shortcut-icon {
-            width: 52px;
-            height: 52px;
-            background: #f8f9fa;
-            border: 1px solid #e8eaed;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        .shortcut-name {
-            font-size: 12px;
-            color: #3c4043;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            width: 100%;
-        }
-
-        .sc-youtube { color: #ff0000; }
-        .sc-google { color: #4285f4; }
-        .sc-gemini { color: #1a73e8; }
-        .sc-chatgpt { color: #10a37f; }
-        .sc-facebook { color: #1877f2; }
     </style>
 </head>
 <body>
 
-    <!-- Top Navigation Toolbar -->
+    <!-- Top Browser Bar (Address & Navigation Controls) -->
     <div class="browser-toolbar">
         <div class="nav-icons">
-            <button class="nav-btn" onclick="goHome()" title="Home">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            <button class="nav-btn" onclick="window.history.back()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
             </button>
-            <button class="nav-btn" onclick="location.reload()" title="Refresh">
+            <button class="nav-btn" onclick="window.history.forward()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+            </button>
+            <button class="nav-btn" onclick="window.location.reload()">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
             </button>
         </div>
 
-        <!-- Address Bar -->
+        <!-- URL Address Bar -->
         <div class="address-bar-wrapper">
             <div class="top-t-logo">T</div>
-            <input type="text" id="topUrlInput" class="top-url-input" placeholder="Type URL or search (e.g., youtube.com)">
+            <input type="text" id="topUrlInput" class="top-url-input" placeholder="Ask TAQI or type a URL" autofocus>
         </div>
 
         <div class="toolbar-actions">
+            <button class="nav-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            </button>
             <div class="user-profile-circle">T</div>
+            <button class="nav-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+            </button>
         </div>
     </div>
 
-    <!-- Main Viewport -->
+    <!-- Main Homepage Viewport -->
     <div class="main-viewport">
+        <!-- Center TAQI Logo -->
         <div class="brand-title">TAQI</div>
 
         <!-- Center Search Box -->
         <div class="center-search-wrapper">
             <svg class="search-glass-icon" viewBox="0 0 24 24">
-                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.1 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
             </svg>
-            <input type="text" id="centerSearchInput" class="center-search-input" placeholder="Search web or enter address...">
-        </div>
-
-        <!-- Direct Shortcuts -->
-        <div class="shortcuts-grid">
-            <div class="shortcut-item" onclick="openUrl('https://www.google.com')">
-                <div class="shortcut-icon sc-google">G</div>
-                <div class="shortcut-name">Google</div>
-            </div>
-            <div class="shortcut-item" onclick="openUrl('https://m.youtube.com')">
-                <div class="shortcut-icon sc-youtube">▶</div>
-                <div class="shortcut-name">YouTube</div>
-            </div>
-            <div class="shortcut-item" onclick="openUrl('https://gemini.google.com')">
-                <div class="shortcut-icon sc-gemini">✨</div>
-                <div class="shortcut-name">Gemini</div>
-            </div>
-            <div class="shortcut-item" onclick="openUrl('https://chatgpt.com')">
-                <div class="shortcut-icon sc-chatgpt">💬</div>
-                <div class="shortcut-name">ChatGPT</div>
-            </div>
-            <div class="shortcut-item" onclick="openUrl('https://m.facebook.com')">
-                <div class="shortcut-icon sc-facebook">f</div>
-                <div class="shortcut-name">Facebook</div>
-            </div>
+            <input type="text" id="centerSearchInput" class="center-search-input" placeholder="Search TAQI Database...">
         </div>
     </div>
 
     <script>
-        // Open any website using Native Android Engine
-        function openUrl(url) {
-            if (window.cordova && window.cordova.InAppBrowser) {
-                // Opens in Native Chrome Engine window inside APK (Bypasses all iframe blocks)
-                window.cordova.InAppBrowser.open(url, '_blank', 'location=yes,hardwareback=yes,zoom=yes,clearcache=no,clearsessioncache=no');
-            } else {
-                // Fallback for standard browser testing
-                window.open(url, '_self');
-            }
-        }
-
-        // Smart Search and URL Handler
         function handleNavigation(query) {
             query = query.trim();
             if (!query) return;
 
-            let targetUrl = '';
-            
-            // If user typed a complete HTTP or HTTPS URL
-            if (query.startsWith('http://') || query.startsWith('https://')) {
-                targetUrl = query;
-            } 
-            // If user typed a domain name like facebook.com or youtube.com
-            else if (query.includes('.') && !query.includes(' ')) {
-                targetUrl = 'https://' + query;
-            } 
-            // Otherwise perform a Google search
-            else {
-                targetUrl = 'https://www.google.com/search?q=' + encodeURIComponent(query);
-            }
+            let lowerQuery = query.toLowerCase();
 
-            openUrl(targetUrl);
+            // Custom Shortcuts
+            if (lowerQuery === 'nexura' || lowerQuery === 'nexura search') {
+                window.location.href = 'https://nexura.oneapp.dev';
+            } else if (lowerQuery === 'taqi' || lowerQuery === 'taqi search') {
+                window.location.href = 'https://taqi.oneapp.dev';
+            } else if (query.startsWith('http://') || query.startsWith('https://')) {
+                window.location.href = query;
+            } else if (query.includes('.') && !query.includes(' ')) {
+                window.location.href = 'https://' + query;
+            } else {
+                window.location.href = 'https://www.google.com/search?q=' + encodeURIComponent(query);
+            }
         }
 
-        // Listen for Enter key press on inputs
+        // Top URL Bar event listener
         document.getElementById('topUrlInput').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') handleNavigation(this.value);
         });
 
+        // Center Search Box event listener
         document.getElementById('centerSearchInput').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') handleNavigation(this.value);
         });
-
-        function goHome() {
-            document.getElementById('topUrlInput').value = '';
-            document.getElementById('centerSearchInput').value = '';
-        }
     </script>
 </body>
 </html>
