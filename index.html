@@ -2,180 +2,52 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TAQI Browser</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-        }
-        body {
-            background-color: #ffffff;
-            color: #202124;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; }
+        body { background: #ffffff; color: #202124; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        .browser-toolbar { display: flex; align-items: center; padding: 8px 14px; background: #fff; border-bottom: 1px solid #e0e0e0; gap: 12px; z-index: 10; }
+        .nav-icons { display: flex; align-items: center; gap: 10px; color: #5f6368; }
+        .nav-btn { background: none; border: none; cursor: pointer; color: #5f6368; display: flex; align-items: center; justify-content: center; border-radius: 50%; padding: 6px; transition: background 0.2s; }
+        .nav-btn:hover { background: #f1f3f4; }
+        .address-bar-wrapper { flex: 1; display: flex; align-items: center; background: #f1f3f4; border-radius: 20px; padding: 0 16px; height: 38px; border: 1px solid transparent; transition: all 0.2s; }
+        .address-bar-wrapper:focus-within { background: #fff; border-color: #003366; box-shadow: 0 1px 6px rgba(0,51,102,0.2); }
+        .top-t-logo { width: 20px; height: 20px; background: #003366; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 11px; margin-right: 10px; flex-shrink: 0; }
+        .top-url-input { width: 100%; border: none; outline: none; background: transparent; font-size: 14px; color: #3c4043; }
+        .toolbar-actions { display: flex; align-items: center; gap: 12px; color: #5f6368; }
+        .user-profile-circle { width: 28px; height: 28px; background: #202124; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; }
 
-        /* Top Browser Navigation Bar (Address Bar) */
-        .browser-toolbar {
-            display: flex;
-            align-items: center;
-            padding: 8px 14px;
-            background: #ffffff;
-            border-bottom: 1px solid #e0e0e0;
-            gap: 12px;
-        }
+        .main-viewport { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; padding-top: 15vh; overflow-y: auto; transition: padding-top 0.3s ease; }
+        .brand-title { font-size: 82px; font-weight: 700; color: #003366; letter-spacing: -1.5px; margin-bottom: 28px; user-select: none; }
+        .center-search-wrapper { width: 550px; max-width: 90vw; position: relative; flex-shrink: 0; }
+        .center-search-input { width: 100%; height: 48px; padding: 0 20px 0 48px; font-size: 15px; background: #fff; border: 1px solid #dfe1e5; border-radius: 24px; outline: none; color: #202124; transition: all 0.2s ease; }
+        .center-search-input:hover, .center-search-input:focus { box-shadow: 0 1px 6px rgba(32,33,36,0.28); border-color: rgba(223,225,229,0); }
+        .search-glass-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; fill: #5f6368; pointer-events: none; }
 
-        .nav-icons {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #5f6368;
-        }
-
-        .nav-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #5f6368;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            padding: 6px;
-            transition: background 0.2s;
-        }
-
-        .nav-btn:hover {
-            background: #f1f3f4;
-        }
-
-        .address-bar-wrapper {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            background: #f1f3f4;
-            border-radius: 20px;
-            padding: 0 16px;
-            height: 38px;
-            border: 1px solid transparent;
-            transition: all 0.2s;
-        }
-
-        .address-bar-wrapper:focus-within {
-            background: #ffffff;
-            border-color: #003366;
-            box-shadow: 0 1px 6px rgba(0, 51, 102, 0.2);
-        }
-
-        .top-t-logo {
-            width: 20px;
-            height: 20px;
-            background: #003366;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 11px;
-            margin-right: 10px;
-            flex-shrink: 0;
-        }
-
-        .top-url-input {
-            width: 100%;
-            border: none;
-            outline: none;
-            background: transparent;
-            font-size: 14px;
-            color: #3c4043;
-        }
-
-        .toolbar-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: #5f6368;
-        }
-
-        .user-profile-circle {
-            width: 28px;
-            height: 28px;
-            background: #202124;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            cursor: pointer;
-        }
-
-        /* Main Page Area */
-        .main-viewport {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            margin-top: -30px;
-        }
-
-        /* TAQI Branding Title */
-        .brand-title {
-            font-size: 82px;
-            font-weight: 700;
-            color: #003366;
-            letter-spacing: -1.5px;
-            margin-bottom: 28px;
-            user-select: none;
-        }
-
-        /* Page Search Box */
-        .center-search-wrapper {
-            width: 550px;
-            max-width: 90vw;
-            position: relative;
-        }
-
-        .center-search-input {
-            width: 100%;
-            height: 48px;
-            padding: 0 20px 0 48px;
-            font-size: 15px;
-            background: #ffffff;
-            border: 1px solid #dfe1e5;
-            border-radius: 24px;
-            outline: none;
-            color: #202124;
-            transition: all 0.2s ease;
-        }
-
-        .center-search-input:hover, .center-search-input:focus {
-            box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
-            border-color: rgba(223, 225, 229, 0);
-        }
-
-        .search-glass-icon {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 18px;
-            height: 18px;
-            fill: #5f6368;
-            pointer-events: none;
-        }
+        .results-container { display: none; flex-direction: column; width: 100%; max-width: 620px; margin-top: 10px; margin-bottom: 40px; text-align: left; }
+        .back-btn { background: none; border: none; color: #003366; cursor: pointer; font-size: 14px; margin-bottom: 20px; display: flex; align-items: center; gap: 5px; font-weight: 600; padding: 5px 0; }
+        .back-btn:hover { text-decoration: underline; }
+        .result-item { margin-bottom: 25px; }
+        .result-url { font-size: 13px; color: #202124; margin-bottom: 4px; word-break: break-all; }
+        .result-title { font-size: 18px; color: #1a0dab; text-decoration: none; display: block; margin-bottom: 4px; line-height: 1.3; font-weight: 500; }
+        .result-title:hover { text-decoration: underline; }
+        .result-snippet { font-size: 14px; color: #4d5156; line-height: 1.5; }
+        .loading, .no-results { font-size: 16px; color: #5f6368; margin-top: 20px; text-align: center; line-height: 1.6; }
+        .fallback-btn { margin-top: 15px; padding: 10px 24px; background: #003366; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; margin-right: 8px; }
+        .fallback-btn:hover { background: #002244; }
+        .fallback-btn.alt { background: #fff; color: #003366; border: 1px solid #003366; }
+        .fallback-btn.alt:hover { background: #f1f3f4; }
+        .search-info { font-size: 13px; color: #5f6368; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #e0e0e0; }
+        .source-badge { display: inline-block; background: #e8f0fe; color: #003366; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-left: 8px; font-weight: 600; }
+        
+        .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #003366; border-top-color: transparent; border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 8px; vertical-align: middle; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <!-- Top Browser Bar (Address & Navigation Controls) -->
     <div class="browser-toolbar">
         <div class="nav-icons">
             <button class="nav-btn" onclick="window.history.back()">
@@ -189,10 +61,9 @@
             </button>
         </div>
 
-        <!-- URL Address Bar -->
         <div class="address-bar-wrapper">
             <div class="top-t-logo">T</div>
-            <input type="text" id="topUrlInput" class="top-url-input" placeholder="Ask TAQI or type a URL" autofocus>
+            <input type="text" id="topUrlInput" class="top-url-input" placeholder="Ask TAQI or type a URL">
         </div>
 
         <div class="toolbar-actions">
@@ -206,47 +77,359 @@
         </div>
     </div>
 
-    <!-- Main Homepage Viewport -->
-    <div class="main-viewport">
-        <!-- Center TAQI Logo -->
-        <div class="brand-title">TAQI</div>
+    <div class="main-viewport" id="mainViewport">
+        <div class="brand-title" id="brandTitle">TAQI</div>
 
-        <!-- Center Search Box -->
         <div class="center-search-wrapper">
             <svg class="search-glass-icon" viewBox="0 0 24 24">
                 <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.1 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
             </svg>
             <input type="text" id="centerSearchInput" class="center-search-input" placeholder="Search TAQI Database...">
         </div>
+
+        <div id="resultsContainer" class="results-container"></div>
     </div>
 
     <script>
         function handleNavigation(query) {
             query = query.trim();
             if (!query) return;
+            const lowerQuery = query.toLowerCase();
 
-            let lowerQuery = query.toLowerCase();
-
-            // Custom Shortcuts
             if (lowerQuery === 'nexura' || lowerQuery === 'nexura search') {
-                window.location.href = 'https://nexura.oneapp.dev';
+                window.open('https://nexura.oneapp.dev', '_blank');
             } else if (lowerQuery === 'taqi' || lowerQuery === 'taqi search') {
-                window.location.href = 'https://taqi.oneapp.dev';
+                window.open('https://taqi.oneapp.dev', '_blank');
             } else if (query.startsWith('http://') || query.startsWith('https://')) {
-                window.location.href = query;
+                window.open(query, '_blank');
             } else if (query.includes('.') && !query.includes(' ')) {
-                window.location.href = 'https://' + query;
+                window.open('https://' + query, '_blank');
             } else {
-                window.location.href = 'https://www.google.com/search?q=' + encodeURIComponent(query);
+                showInSiteResults(query);
             }
         }
 
-        // Top URL Bar event listener
+        /* =====================================================
+           METHOD 1: DuckDuckGo Instant Answer API (CORS ok)
+           ===================================================== */
+        async function searchDDGInstant(query) {
+            try {
+                const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=0&origin=*`;
+                const res = await fetch(url);
+                if (!res.ok) return [];
+                const data = await res.json();
+                const results = [];
+
+                // Main abstract
+                if (data.AbstractText && data.AbstractURL) {
+                    results.push({
+                        title: data.Heading || query,
+                        url: data.AbstractURL,
+                        content: data.AbstractText,
+                        source: 'DDG'
+                    });
+                }
+
+                // Answer
+                if (data.Answer && data.AbstractURL) {
+                    results.push({
+                        title: `Answer: ${query}`,
+                        url: data.AbstractURL,
+                        content: data.Answer,
+                        source: 'DDG'
+                    });
+                }
+
+                // Definition
+                if (data.Definition && data.DefinitionURL) {
+                    results.push({
+                        title: `Definition: ${query}`,
+                        url: data.DefinitionURL,
+                        content: data.Definition,
+                        source: 'DDG'
+                    });
+                }
+
+                // Results (direct)
+                if (data.Results && data.Results.length > 0) {
+                    data.Results.forEach(r => {
+                        if (results.length >= 12) return;
+                        if (r.FirstURL && r.Text) {
+                            results.push({
+                                title: r.Text.split(' - ')[0].substring(0, 80),
+                                url: r.FirstURL,
+                                content: r.Text,
+                                source: 'DDG'
+                            });
+                        }
+                    });
+                }
+
+                // Related topics (nested handling)
+                if (data.RelatedTopics && data.RelatedTopics.length > 0) {
+                    data.RelatedTopics.forEach(topic => {
+                        if (results.length >= 15) return;
+                        if (topic.Topics) {
+                            topic.Topics.forEach(t => {
+                                if (results.length >= 15) return;
+                                if (t.FirstURL && t.Text) {
+                                    results.push({
+                                        title: t.Text.split(' - ')[0].substring(0, 80),
+                                        url: t.FirstURL,
+                                        content: t.Text,
+                                        source: 'DDG'
+                                    });
+                                }
+                            });
+                        } else if (topic.FirstURL && topic.Text) {
+                            results.push({
+                                title: topic.Text.split(' - ')[0].substring(0, 80),
+                                url: topic.FirstURL,
+                                content: topic.Text,
+                                source: 'DDG'
+                            });
+                        }
+                    });
+                }
+
+                return results;
+            } catch (e) {
+                console.warn('DDG Instant failed:', e.message);
+                return [];
+            }
+        }
+
+        /* =====================================================
+           METHOD 2: DDG HTML via r.jina.ai (clean markdown)
+           ===================================================== */
+        async function searchJinaDDG(query) {
+            try {
+                const ddgUrl = 'https://html.duckduckgo.com/html/?q=' + encodeURIComponent(query);
+                const jinaUrl = 'https://r.jina.ai/' + ddgUrl;
+                const controller = new AbortController();
+                const t = setTimeout(() => controller.abort(), 15000);
+                const res = await fetch(jinaUrl, { signal: controller.signal });
+                clearTimeout(t);
+                if (!res.ok) return [];
+                const text = await res.text();
+                if (!text || text.length < 200) return [];
+
+                const results = [];
+                const seen = new Set();
+                // Markdown links: [Title](url)
+                const linkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
+                let match;
+                while ((match = linkRegex.exec(text)) !== null) {
+                    if (results.length >= 12) break;
+                    const title = match[1].trim();
+                    const link = match[2].trim();
+                    if (!title || !link) continue;
+                    if (link.includes('duckduckgo.com')) continue;
+                    if (link.includes('r.jina.ai')) continue;
+                    if (seen.has(link)) continue;
+                    if (title.length < 5) continue;
+                    // Skip likely non-result links
+                    if (title.toLowerCase().includes('privacy') && title.toLowerCase().includes('duckduckgo')) continue;
+                    seen.add(link);
+                    results.push({
+                        title: title.substring(0, 100),
+                        url: link,
+                        content: '',
+                        source: 'DDG'
+                    });
+                }
+                console.log('Jina returned', results.length, 'results');
+                return results;
+            } catch (e) {
+                console.warn('Jina failed:', e.message);
+                return [];
+            }
+        }
+
+        /* =====================================================
+           METHOD 3: DDG HTML via CORS proxies
+           ===================================================== */
+        const PROXIES = [
+            (url) => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url),
+            (url) => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+            (url) => 'https://corsproxy.io/?url=' + encodeURIComponent(url),
+            (url) => 'https://cors.eu.org/' + url,
+        ];
+
+        async function searchProxyDDG(query) {
+            const ddgUrl = 'https://html.duckduckgo.com/html/?q=' + encodeURIComponent(query);
+            for (const proxy of PROXIES) {
+                try {
+                    const controller = new AbortController();
+                    const t = setTimeout(() => controller.abort(), 10000);
+                    const res = await fetch(proxy(ddgUrl), { signal: controller.signal });
+                    clearTimeout(t);
+                    if (!res.ok) continue;
+                    const html = await res.text();
+                    if (!html || html.length < 500) continue;
+                    const parsed = parseDDGHtml(html);
+                    if (parsed && parsed.length >= 3) {
+                        console.log('Proxy DDG:', parsed.length, 'results');
+                        return parsed;
+                    }
+                } catch (e) {
+                    console.warn('Proxy failed:', e.message);
+                }
+            }
+            return [];
+        }
+
+        function parseDDGHtml(html) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            let items = doc.querySelectorAll('.result__body, .web-result');
+            if (items.length === 0) items = doc.querySelectorAll('.result');
+
+            const results = [];
+            items.forEach(item => {
+                if (results.length >= 15) return;
+                const linkEl = item.querySelector('a.result__a, h2 a');
+                if (!linkEl) return;
+                let link = linkEl.getAttribute('href') || '';
+                if (link.includes('uddg=')) {
+                    try {
+                        const params = new URLSearchParams(link.split('?')[1]);
+                        link = decodeURIComponent(params.get('uddg'));
+                    } catch (e) {}
+                }
+                if (!link.startsWith('http')) return;
+                const title = linkEl.innerText.trim();
+                if (!title) return;
+                const snippetEl = item.querySelector('.result__snippet');
+                const snippet = snippetEl ? snippetEl.innerText.trim() : '';
+                results.push({ title, url: link, content: snippet, source: 'DDG' });
+            });
+            return results;
+        }
+
+        /* =====================================================
+           MAIN DISPLAY
+           ===================================================== */
+        async function showInSiteResults(query) {
+            const brandTitle = document.getElementById('brandTitle');
+            const resultsContainer = document.getElementById('resultsContainer');
+            const mainViewport = document.getElementById('mainViewport');
+
+            brandTitle.style.display = 'none';
+            mainViewport.style.paddingTop = '20px';
+            resultsContainer.style.display = 'flex';
+            resultsContainer.innerHTML = '<div class="loading"><span class="spinner"></span> Searching DuckDuckGo...</div>';
+
+            // Run DDG Instant + Jina in parallel (fast ones first)
+            const [instantResults, jinaResults] = await Promise.all([
+                searchDDGInstant(query),
+                searchJinaDDG(query)
+            ]);
+
+            let allResults = [...instantResults, ...jinaResults];
+
+            // If we have less than 5 results, try CORS proxies
+            if (allResults.length < 5) {
+                resultsContainer.innerHTML = '<div class="loading"><span class="spinner"></span> Trying fallback...</div>';
+                const proxyResults = await searchProxyDDG(query);
+                allResults = [...allResults, ...proxyResults];
+            }
+
+            // Dedupe by URL
+            const seen = new Set();
+            const uniqueResults = allResults.filter(r => {
+                if (!r.url || seen.has(r.url)) return false;
+                seen.add(r.url);
+                return true;
+            });
+
+            console.log('Total unique results:', uniqueResults.length);
+
+            if (uniqueResults.length === 0) {
+                resultsContainer.innerHTML = `
+                    <button class="back-btn" onclick="clearResults()">← Back to TAQI</button>
+                    <div class="no-results">
+                        "<b>${escapeHtml(query)}</b>" ke liye results nahi mile.<br>
+                        <small style="color:#888">Niche buttons se poora web search karein.</small>
+                        <br><br>
+                        <button class="fallback-btn" onclick="window.open('https://duckduckgo.com/?q=${encodeURIComponent(query)}', '_blank')">
+                            DuckDuckGo par Search Karein
+                        </button>
+                        <button class="fallback-btn alt" onclick="window.open('https://www.google.com/search?q=${encodeURIComponent(query)}', '_blank')">
+                            Google par Search Karein
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            let htmlOut = `
+                <button class="back-btn" onclick="clearResults()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                    Back to TAQI
+                </button>
+                <div class="search-info">
+                    Results for: <b>${escapeHtml(query)}</b> (${uniqueResults.length} found)
+                </div>
+            `;
+
+            uniqueResults.slice(0, 15).forEach(r => {
+                const link = r.url;
+                const title = r.title || 'No title';
+                const snippet = r.content || '';
+                const source = r.source || '';
+
+                let displayUrl = '';
+                try { displayUrl = new URL(link).hostname.replace('www.', ''); }
+                catch (e) { displayUrl = link.replace(/^https?:\/\//, '').split('/')[0]; }
+
+                htmlOut += `
+                    <div class="result-item">
+                        <div class="result-url">${escapeHtml(displayUrl)}${source ? `<span class="source-badge">${escapeHtml(source)}</span>` : ''}</div>
+                        <a href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer" class="result-title">${escapeHtml(title)}</a>
+                        ${snippet ? `<div class="result-snippet">${escapeHtml(snippet)}</div>` : ''}
+                    </div>
+                `;
+            });
+
+            htmlOut += `
+                <div style="margin-top:30px; padding-top:20px; border-top:1px solid #e0e0e0; text-align:center;">
+                    <p style="font-size:13px; color:#5f6368; margin-bottom:12px;">Aur zyada results chahiye?</p>
+                    <button class="fallback-btn" onclick="window.open('https://duckduckgo.com/?q=${encodeURIComponent(query)}', '_blank')">
+                        DuckDuckGo par Search
+                    </button>
+                    <button class="fallback-btn alt" onclick="window.open('https://www.google.com/search?q=${encodeURIComponent(query)}', '_blank')">
+                        Google par Search
+                    </button>
+                </div>
+            `;
+
+            resultsContainer.innerHTML = htmlOut;
+        }
+
+        function escapeHtml(s) {
+            if (!s) return '';
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function clearResults() {
+            document.getElementById('brandTitle').style.display = 'block';
+            document.getElementById('mainViewport').style.paddingTop = '15vh';
+            document.getElementById('resultsContainer').style.display = 'none';
+            document.getElementById('resultsContainer').innerHTML = '';
+            document.getElementById('centerSearchInput').value = '';
+            document.getElementById('centerSearchInput').focus();
+        }
+
         document.getElementById('topUrlInput').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') handleNavigation(this.value);
         });
 
-        // Center Search Box event listener
         document.getElementById('centerSearchInput').addEventListener('keydown', function(e) {
             if (e.key === 'Enter') handleNavigation(this.value);
         });
